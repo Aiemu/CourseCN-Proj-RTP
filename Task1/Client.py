@@ -1,9 +1,11 @@
+import socket, threading, sys, traceback, os, tkinter
+
 from tkinter import *
-import tkinter.messagebox
 from PIL import Image, ImageTk
-import socket, threading, sys, traceback, os
+from tkinter import messagebox, Tk
 
 from RtpPacket import RtpPacket
+
 
 CACHE_FILE_NAME = "cache-"
 CACHE_FILE_EXT = ".jpg"
@@ -138,7 +140,8 @@ class Client:
 		try:
 			self.rtspSocket.connect((self.serverAddr, self.serverPort))
 		except:
-			tkMessageBox.showwarning('Connection Failed', 'Connection to \'%s\' failed.' %self.serverAddr)
+			# tkMessageBox.showwarning('Connection Failed', 'Connection to \'%s\' failed.' %self.serverAddr)
+			messagebox.showwarning('Connection Failed', 'Connection to \'%s\' failed.' %self.serverAddr)
 	
 	def sendRtspRequest(self, requestCode):
 		"""Send RTSP request to the server."""
@@ -246,3 +249,18 @@ class Client:
 			self.exitClient()
 		else: # When the user presses cancel, resume playing.
 			self.playMovie()
+	
+if __name__ == "__main__": 
+	try:
+		serverAddr = sys.argv[1]
+		serverPort = sys.argv[2]
+		rtpPort = sys.argv[3]
+		fileName = sys.argv[4]	
+	except:
+		print ("[Usage: ClientLauncher.py Server_name Server_port RTP_port Video_file]\n")	
+
+	root = tkinter.Tk()
+
+	client = Client(root, serverAddr, serverPort, rtpPort, fileName)
+	client.master.title('RTP Client')
+	root.mainloop()
