@@ -3,16 +3,17 @@ import sys, traceback, threading, socket
 
 from RtpPacket import RtpPacket
 
-
+# server state
 STATE = {
     'INIT': 0,
     'OK': 1,
     'PLAYING': 2,
 }
 
-
 # process vided stream
 class Streaming:
+    count = 1
+
     def __init__(self, path):
         self.path = path
 
@@ -33,11 +34,15 @@ class Streaming:
         return self.file
 
     def getNextFrame(self): 
-        data = self.file.read(5)
-
-        if data:
-            data = self.file.read(int(data))
-            self.currentFrame += 1
+        self.count += 1
+        path = 'img/' + str(self.count) + '.png'
+        print(path)
+        try:
+            self.file = open(path, 'rb')
+        except:
+            raise IOError
+        data = self.file.read()
+        self.currentFrame += 1
 
         return data
 
@@ -59,7 +64,7 @@ class Server:
         sk = self.clientInfo['rtspSocket'][0]
 
         while 1:
-            data = sk.recv(256).decode()
+            data = sk.recv(1024).decode()
 
             if data:
                 print('Recv:', data)
@@ -176,7 +181,7 @@ class Server:
     def sendPacket(self): 
         while 1:
             # set interval
-            self.clientInfo['event'].wait(0.05)
+            self.clientInfo['event'].wait(0.5)
 
             # break if pause or teardown
             if self.clientInfo['event'].isSet():
