@@ -150,3 +150,4 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "倍速调整"))
         self.btn_slower.setText(_translate("MainWindow", "0.5"))
         self.btn_faster.setText(_translate("MainWindow", "2.0"))
+        self.label_display.setText(_translate("MainWindow", "fasdfdjbasdlfjhkbasjdklfbfhasjdkhfbaskjdfbsauhdf"))
