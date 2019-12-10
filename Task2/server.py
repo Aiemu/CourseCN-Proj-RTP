@@ -4,7 +4,7 @@ import sys, traceback, threading, socket, cv2, os
 from RtpPacket import RtpPacket
 
 CUTFRAME_SIZE = 20480
-CYCLE = 1/30
+CYCLE = 1/20
 
 # server state
 STATE = {
@@ -12,6 +12,8 @@ STATE = {
     'OK': 1,
     'PLAYING': 2,
 }
+
+# sudo sysctl -w net.inet.udp.maxdgram=65535
 
 # process vided stream
 class Streaming:
@@ -64,6 +66,10 @@ class Server:
     
     def __init__(self, clientInfo):
         self.clientInfo = clientInfo
+        self.cycle_ins = CYCLE
+        self.cycle_normal = self.cycle_ins
+        self.cycle_faster = self.cycle_ins / 2 # faster
+        self.cycle_slower = self.cycle_ins * 2 # slower
     
     # 多client连接
     def processThreads(self):
@@ -128,7 +134,7 @@ class Server:
                 print ('PLAY...')
                 
                 # set state
-                self.state == STATE['PLAYING']
+                self.state = STATE['PLAYING']
 
                 # create sk
                 self.clientInfo['rtpSocket'] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -166,6 +172,7 @@ class Server:
                 sk = self.clientInfo['rtspSocket'][0]
                 sk.send(response.encode())
 
+        # state teardown
         elif kind == 'TEARDOWN':
             # msg
             print ('TEARDOWN...')
@@ -184,13 +191,45 @@ class Server:
             # close sk
             self.clientInfo['rtpSocket'].close()
 
+        # state faster
+        elif kind == 'FASTER':
+            if self.state == STATE['PLAYING'] or self.state == STATE['OK']:
+                # msg
+                print ('FASTER...') 
+
+                self.cycle_ins = self.cycle_faster
+
+                # response msg
+                response = 'RTSP/1.0 200 OK\nCSeq: ' + \
+                    seqList[1] + \
+                    '\nSession: ' + \
+                    str(self.clientInfo['session'])
+                sk = self.clientInfo['rtspSocket'][0]
+                sk.send(response.encode())
+
+        # state slower
+        elif kind == 'SLOWER':
+            if self.state == STATE['PLAYING'] or self.state == STATE['OK']:
+                # msg
+                print ('SLOWER...') 
+
+                self.cycle_ins = self.cycle_slower
+
+                # response msg
+                response = 'RTSP/1.0 200 OK\nCSeq: ' + \
+                    seqList[1] + \
+                    '\nSession: ' + \
+                    str(self.clientInfo['session'])
+                sk = self.clientInfo['rtspSocket'][0]
+                sk.send(response.encode())
+
         else:
             print ('Error: Wrong kind.')
 
     def sendPacket(self): 
         while 1:
             # set interval
-            self.clientInfo['event'].wait(CYCLE)
+            self.clientInfo['event'].wait(self.cycle_ins)
 
             # break if pause or teardown
             if self.clientInfo['event'].isSet():
@@ -203,33 +242,37 @@ class Server:
                 # get current frame
                 currentFrame = self.clientInfo['videoStream'].getCurrentFrame()
 
-                # get addr
-                ip = self.clientInfo['rtspSocket'][1][0]
-                port = int(self.clientInfo['rtpPort'])
-                counter = 0
-                ifEnd = 0
-                while 1:
-                    if counter * CUTFRAME_SIZE + CUTFRAME_SIZE <= len(frame):
-                        cutFrame = frame[counter * CUTFRAME_SIZE:counter * CUTFRAME_SIZE + CUTFRAME_SIZE]
+                try:
+                    # get addr
+                    ip = self.clientInfo['rtspSocket'][1][0]
+                    port = int(self.clientInfo['rtpPort'])
+                    counter = 0
+                    ifEnd = 0
+                    while 1:
+                        if counter * CUTFRAME_SIZE + CUTFRAME_SIZE <= len(frame):
+                            cutFrame = frame[counter * CUTFRAME_SIZE:counter * CUTFRAME_SIZE + CUTFRAME_SIZE]
 
-                        self.clientInfo['rtpSocket'].sendto(self.setPacket(cutFrame, currentFrame, counter, ifEnd), (ip, port))
+                            self.clientInfo['rtpSocket'].sendto(self.setPacket(cutFrame, currentFrame, counter, ifEnd), (ip, port))
 
-                        # next frame cut
-                        counter += 1
+                            # next frame cut
+                            counter += 1
 
-                    else:
-                        cutFrame = frame[counter * CUTFRAME_SIZE:len(frame)]
+                        else:
+                            cutFrame = frame[counter * CUTFRAME_SIZE:len(frame)]
 
-                        # end
-                        ifEnd = 1
+                            # end
+                            ifEnd = 1
 
-                        self.clientInfo['rtpSocket'].sendto(self.setPacket(cutFrame, currentFrame, counter, ifEnd), (ip, port))
+                            self.clientInfo['rtpSocket'].sendto(self.setPacket(cutFrame, currentFrame, counter, ifEnd), (ip, port))
 
-                        # init
-                        ifEnd = 0
-                        counter = 0
+                            # init
+                            ifEnd = 0
+                            counter = 0
 
-                        break
+                            break
+
+                except:
+                    print('Error: Connecting failed.')
 
                 # try: 
                 #     # get addr
