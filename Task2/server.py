@@ -318,32 +318,7 @@ class Server:
                 except:
                     print('Error: Connecting failed.')
 
-                # try: 
-                #     # get addr
-                #     ip = self.clientInfo['rtspSocket'][1][0]
-                #     port = int(self.clientInfo['rtpPort'])
-                #     counter = 0
-                #     ifEnd = 0
-                #     while 1:
-                #         if counter * CUTFRAME_SIZE + CUTFRAME_SIZE <= len(frame):
-                #             cutFrame = frame[counter * CUTFRAME_SIZE:counter * CUTFRAME_SIZE + CUTFRAME_SIZE]
-
-                #             self.clientInfo['rtpSocket'].sendto(self.setPacket(cutFrame, currentFrame, counter, ifEnd), (ip, port))
-
-                #             # next frame cut
-                #             counter += 1
-
-                #         else:
-                #             cutFrame = frame[counter * CUTFRAME_SIZE:len(frame)]
-
-                #             # end
-                #             ifEnd = 1
-
-                #             self.clientInfo['rtpSocket'].sendto(self.setPacket(cutFrame, currentFrame, counter, ifEnd), (ip, port))
-
-                # except: 
-                #     print('Error: Connecting failed.')
-
+    # create packet
     def setPacket(self, frame, currentFrame, counter, ifEnd, frameNo, totalFrame):
         # set packet
         rtpPacket = RtpPacket()
