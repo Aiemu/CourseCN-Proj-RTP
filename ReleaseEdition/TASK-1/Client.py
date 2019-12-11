@@ -258,7 +258,7 @@ if __name__ == "__main__":
 		rtpPort = sys.argv[3]
 		fileName = sys.argv[4]	
 	except:
-		print ('Error: Wrong params.')	
+		print ("[Usage: ClientLauncher.py Server_name Server_port RTP_port Video_file]\n")	
 
 	root = tkinter.Tk()
 

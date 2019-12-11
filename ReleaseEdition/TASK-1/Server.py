@@ -35,12 +35,14 @@ class Streaming:
 
     def getNextFrame(self): 
         self.count += 1
-        path = 'img/' + str(self.count) + '.png'
+        path = 'img/' + str(self.count) + '.jpg'
         print(path)
         try:
             self.file = open(path, 'rb')
         except:
-            raise IOError
+            self.count = 1
+            self.file = open('img/1.jpg', 'rb')
+
         data = self.file.read()
         self.currentFrame += 1
 

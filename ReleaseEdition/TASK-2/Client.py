@@ -42,6 +42,20 @@ class QLabel(QLabel):
             elif client.state == client.READY:
                 client.playMovie()
 
+        # if event.key() == QtCore.Qt.Key_Left: 
+        #     if client.state == client.PLAYING or client.state == client.READY:
+        #         if (client.page_main.scrollLine.value() - 3 > 0):
+        #             client.page_main.scrollLine.setValue(client.page_main.scrollLine.value() - 3)
+        #             client.relocatePosition = client.page_main.scrollLine.value()
+        #     client.sendRtspRequest(client.RELOCATE)
+
+        # if event.key() == QtCore.Qt.Key_Right: 
+        #     if client.state == client.PLAYING or client.state == client.READY:
+        #         if (client.page_main.scrollLine.value() + 3 < 100):
+        #             client.page_main.scrollLine.setValue(client.page_main.scrollLine.value() + 3)
+        #             client.relocatePosition = client.page_main.scrollLine.value()
+        #     client.sendRtspRequest(client.RELOCATE)
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
