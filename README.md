@@ -7,7 +7,21 @@
 
 
 ### 运行方式
-请参照`TASK-1/doc.pdf`
+#### Server端
+在终端运行下列指令：
+``` bash
+python3 Server.py [port] 
+# e.g. 
+# python3 Server.py 8000
+```
+
+### Client端
+在终端运行下列指令：
+``` bash
+python3 Client.py [server_ip] [server_port] [client_port] [file_name]
+# e.g. 
+# python3 Client.py 127.0.0.1 8000 9000 img/1.png
+```
 
 
 ### 运行效果
@@ -62,8 +76,21 @@
 
 
 ### 运行方式
-请参照`TASK-2/doc.pdf`
+#### Server端
+在终端运行下列指令：
+``` bash
+python3 Server.py [port] 
+# e.g. 
+# python3 Server.py 8000
+```
 
+### Client端
+在终端运行下列指令：
+``` bash
+python3 Client.py [server_ip] [server_port] [client_port] [file_name]
+# e.g. 
+# python3 Client.py 127.0.0.1 8000 9000 test.mp4
+```
 
 ### 运行效果
 #### 初始界面
